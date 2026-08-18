@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__pycharm__list_directory_tree"
+    ]
+  }
+}
