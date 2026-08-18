@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc && node scripts/add-shebang.js",
-    "build:exe": "npm run build && npx @yao-pkg/pkg dist/index.js --targets node20-win-x64 --output bin/surl.exe",
+    "build:exe": "npm run build && npx nexe dist/index.js -o bin/surl.exe -t windows-x64-18.17.1",
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -37,7 +37,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/user/surl.git"
+    "url": "https://github.com/sorrysvj/surl.git"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -97,7 +97,7 @@ export function rewriteHtml(
   currentFilePath: string,
   rewriteMap: RewriteMap
 ): string {
-  const $ = cheerio.load(html, { decodeEntities: false });
+  const $ = cheerio.load(html);
 
   // Get base URL if present
   const baseHref = $('base').attr('href');

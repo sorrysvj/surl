@@ -2,6 +2,11 @@ import * as cssTree from 'css-tree';
 import { ParsedResource } from '../types/index.js';
 import { resolveUrl, getResourceType } from '../utils/url.js';
 
+interface CssUrlValue {
+  type: string;
+  value: string;
+}
+
 /**
  * Parse CSS and extract all resource URLs
  */
@@ -36,15 +41,16 @@ export function parseCss(css: string, cssUrl: string): ParsedResource[] {
       visit: 'Url',
       enter(node) {
         // Extract URL from url() function
-        if (node.value) {
+        const value = node.value as string | CssUrlValue | undefined;
+        if (value) {
           let url: string;
 
-          if (typeof node.value === 'string') {
-            url = node.value;
-          } else if (node.value.type === 'String') {
-            url = node.value.value;
-          } else if (node.value.type === 'Raw') {
-            url = node.value.value;
+          if (typeof value === 'string') {
+            url = value;
+          } else if (value.type === 'String') {
+            url = value.value;
+          } else if (value.type === 'Raw') {
+            url = value.value;
           } else {
             return;
           }
@@ -104,15 +110,16 @@ export function parseCss(css: string, cssUrl: string): ParsedResource[] {
           cssTree.walk(node.block, {
             visit: 'Url',
             enter(urlNode) {
-              if (urlNode.value) {
+              const value = urlNode.value as string | CssUrlValue | undefined;
+              if (value) {
                 let url: string;
 
-                if (typeof urlNode.value === 'string') {
-                  url = urlNode.value;
-                } else if (urlNode.value.type === 'String') {
-                  url = urlNode.value.value;
-                } else if (urlNode.value.type === 'Raw') {
-                  url = urlNode.value.value;
+                if (typeof value === 'string') {
+                  url = value;
+                } else if (value.type === 'String') {
+                  url = value.value;
+                } else if (value.type === 'Raw') {
+                  url = value.value;
                 } else {
                   return;
                 }
