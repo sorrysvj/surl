@@ -50,6 +50,9 @@ tests/
 # Build output
 dist/
 
+# Claude Code settings
+.claude/
+
 # Claude Code
 .claude/
 
