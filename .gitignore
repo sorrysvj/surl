@@ -1,10 +1,80 @@
 # Dependencies
 node_modules/
 
+# Build output that shouldn't be in repo
+dist/
+
+# Claude Code settings
+.claude/
+
+# Tests (optional)
+tests/
+
+# Build output and local config
+dist/
+.claude/
+tests/
+
+# Build output and local config
+dist/
+.claude/
+tests/
+
+# Claude Code
+.claude/
+
+# Build output (compile from source)
+dist/
+
+# Tests (local only)
+tests/
+
+# Build output (compiled)
+dist/
+
+# Claude Code settings
+.claude/
+
+# Tests (local only)
+tests/
+
+# Build output (compiled from src/)
+dist/
+
+# Claude Code settings
+.claude/
+
+# Tests (not needed in repo)
+tests/
+
 # Build output
 dist/
+
+# Claude Code
+.claude/
+
+# Tests (local only)
+tests/
+
+# Claude Code
+.claude/
+
+# Claude Code settings
+.claude/
+
+# Tests (keep locally, exclude from repo)
+tests/ - keep in repo for npm installs
+
+# Claude Code settings
+.claude/
+
+# Tests (not published)
+tests/
 bin/
 *.exe
+
+# Claude Code
+.claude/
 
 # IDE
 .idea/
