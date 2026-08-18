@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc && node scripts/add-shebang.js",
-    "build:exe": "npm run build && npx nexe dist/index.js -o bin/surl.exe -t windows-x64-18.17.1",
+    "build:exe": "npm run build && npx pkg dist/index.js --targets node18-win-x64 --output bin/surl.exe",
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -33,7 +33,7 @@
     "offline",
     "archive"
   ],
-  "author": "",
+  "author": "sorrysvj",
   "license": "MIT",
   "repository": {
     "type": "git",
