@@ -7,6 +7,7 @@
 #include "surl/util/strings.hpp"
 
 #include <algorithm>
+#include <ctime>
 #include <map>
 
 namespace fs = std::filesystem;

@@ -13,6 +13,7 @@
 #include "surl/version.hpp"
 
 #ifdef _WIN32
+#include <algorithm>
 #include <windows.h>
 #endif
 

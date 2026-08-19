@@ -6,6 +6,7 @@
 #include "surl/util/strings.hpp"
 #include "surl/version.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 
 namespace surl {

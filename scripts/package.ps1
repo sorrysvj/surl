@@ -41,6 +41,16 @@ $RepoRoot = Split-Path -Parent $PSScriptRoot
 if (-not $BuildDir) { $BuildDir = Join-Path $RepoRoot 'build/Release' }
 if (-not $OutputDir) { $OutputDir = Join-Path $RepoRoot 'dist' }
 
+# Both paths are handed to Inno Setup, which resolves relative paths against
+# the .iss file's own directory rather than the current one. Anything relative
+# would silently look in installer/windows/, so resolve to absolute here.
+function Resolve-AbsolutePath([string]$Path) {
+    if ([System.IO.Path]::IsPathRooted($Path)) { return $Path }
+    return [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $Path))
+}
+$BuildDir = Resolve-AbsolutePath $BuildDir
+$OutputDir = Resolve-AbsolutePath $OutputDir
+
 $Version = (Get-Content (Join-Path $RepoRoot 'VERSION.txt') -Raw).Trim()
 
 function Write-Step([string]$Message) {

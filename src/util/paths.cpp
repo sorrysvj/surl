@@ -2,6 +2,7 @@
 
 #include "surl/util/fsutil.hpp"
 
+#include <cstdint>
 #include <cstdlib>
 
 #ifdef _WIN32
@@ -10,6 +11,11 @@
 #include <limits.h>
 #include <pwd.h>
 #include <unistd.h>
+#endif
+
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#include <cstring>
 #endif
 
 namespace fs = std::filesystem;
@@ -136,10 +142,15 @@ fs::path executable_path() {
         buffer.resize(buffer.size() * 2);
     }
 #elif defined(__APPLE__)
+    // macOS has no /proc; ask dyld how long the path is, then for the path.
+    std::uint32_t size = 0;
+    _NSGetExecutablePath(nullptr, &size);
+    std::string buffer(size, char{});
+    if (_NSGetExecutablePath(buffer.data(), &size) != 0) return fs::current_path();
+    buffer.resize(std::strlen(buffer.c_str()));
     std::error_code ec;
-    const fs::path self = fs::read_symlink("/proc/self/exe", ec);
-    if (!ec) return self;
-    return fs::current_path();
+    const fs::path resolved = fs::weakly_canonical(fs::path(buffer), ec);
+    return ec ? fs::path(buffer) : resolved;
 #else
     std::error_code ec;
     const fs::path self = fs::read_symlink("/proc/self/exe", ec);

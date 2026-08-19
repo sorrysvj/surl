@@ -5,6 +5,7 @@
 #include "surl/util/mime.hpp"
 #include "surl/util/strings.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <cstring>
 #include <string>
