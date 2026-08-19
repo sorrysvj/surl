@@ -1,0 +1,41 @@
+// Windows version resource. Configured by CMake so the version shown in
+// Explorer always matches VERSION.txt.
+#include <winver.h>
+
+#define SURL_ICON_ID 1
+
+// Copied next to this file by CMake; a bare name keeps the .rc ASCII-only.
+SURL_ICON_ID ICON "surl.ico"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION    @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+ PRODUCTVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+ FILEFLAGSMASK  VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+ FILEFLAGS      VS_FF_DEBUG
+#else
+ FILEFLAGS      0x0L
+#endif
+ FILEOS         VOS_NT_WINDOWS32
+ FILETYPE       VFT_APP
+ FILESUBTYPE    VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",      "sorrysvj"
+            VALUE "FileDescription",  "SURL - website mirroring CLI"
+            VALUE "FileVersion",      "@PROJECT_VERSION@.0"
+            VALUE "InternalName",     "surl"
+            VALUE "LegalCopyright",   "Copyright (C) 2026 sorrysvj. MIT licensed."
+            VALUE "OriginalFilename", "surl.exe"
+            VALUE "ProductName",      "SURL"
+            VALUE "ProductVersion",   "@PROJECT_VERSION@"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
