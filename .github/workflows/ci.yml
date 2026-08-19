@@ -1,0 +1,175 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+  workflow_dispatch:
+
+# Only the newest run of a branch matters; cancel anything it supersedes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows x64 (MSVC)
+            os: windows-2022
+            preset: windows-release
+          - name: Ubuntu x64 (GCC)
+            os: ubuntu-latest
+            preset: linux-release
+          - name: macOS arm64 (Clang)
+            os: macos-latest
+            preset: macos-release
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libcurl4-openssl-dev
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Set up MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Install Ninja (Windows)
+        if: runner.os == 'Windows'
+        uses: seanmiddleditch/gha-setup-ninja@v5
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }} -DSURL_WERROR=ON
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }} --parallel
+
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }}
+
+      - name: Smoke test the binary
+        shell: bash
+        run: |
+          BIN="build/${{ matrix.preset }}/surl"
+          [ -f "$BIN.exe" ] && BIN="$BIN.exe"
+          "$BIN" --version
+          "$BIN" --help > /dev/null
+          "$BIN" doctor --json || true
+
+      - name: Upload the built binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: surl-${{ matrix.preset }}
+          path: |
+            build/${{ matrix.preset }}/surl
+            build/${{ matrix.preset }}/surl.exe
+          if-no-files-found: error
+          retention-days: 7
+
+  installer:
+    name: Windows installer
+    runs-on: windows-2022
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v5
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: ./scripts/install-innosetup.ps1
+
+      - name: Build Release
+        run: |
+          cmake --preset windows-release
+          cmake --build --preset windows-release --parallel
+
+      - name: Package
+        shell: pwsh
+        run: ./scripts/package.ps1 -BuildDir build/windows-release
+
+      - name: Verify checksums
+        shell: pwsh
+        run: ./scripts/checksum.ps1 -Verify
+
+      # A packaged installer that cannot install is not a packaged installer.
+      - name: Install, verify and uninstall
+        shell: pwsh
+        run: ./scripts/test-installer.ps1
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: surl-windows-x64-assets
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  sanity:
+    name: Repository sanity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generated assets are up to date
+        run: |
+          python3 scripts/make_translations.py
+          python3 scripts/make_icon.py
+          if ! git diff --quiet; then
+            echo "::error::Generated files differ from their generators. Re-run scripts/make_translations.py and scripts/make_icon.py and commit the result."
+            git --no-pager diff --stat
+            exit 1
+          fi
+
+      - name: Version is a valid semantic version
+        run: |
+          VERSION="$(tr -d '[:space:]' < VERSION.txt)"
+          echo "VERSION.txt = $VERSION"
+          echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || {
+            echo "::error::VERSION.txt must contain a bare x.y.z version"
+            exit 1
+          }
+
+      - name: No secrets committed
+        run: |
+          # A cheap guard against the classics; the real protection is not
+          # putting credentials in the repository in the first place.
+          if grep -rInE '(ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)' \
+               --exclude-dir=.git . ; then
+            echo "::error::Something that looks like a credential is committed."
+            exit 1
+          fi

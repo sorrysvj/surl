@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest something SURL should be able to do.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: >
+        Describe the problem rather than the solution. Knowing what you are
+        actually trying to achieve often reveals a better answer than the one
+        being asked for.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like SURL to do?
+      description: If you have a specific flag or command in mind, sketch it here.
+      placeholder: surl mirror https://example.com --something
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What have you tried?
+      description: >
+        Existing flags that got close, other tools, workarounds. This helps
+        judge whether the feature is really missing.
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Please confirm
+      options:
+        - label: >
+            This does not require executing JavaScript or embedding a browser
+            engine (see the Limitations section of the README).
+          required: true
+        - label: >
+            This does not require a new third-party dependency, or I have
+            explained in the proposal why one is unavoidable.
+          required: true
