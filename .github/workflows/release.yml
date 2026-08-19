@@ -12,7 +12,7 @@ on:
         type: string
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: false
 
 # Minimal by default; only the publish job is allowed to write.
@@ -117,10 +117,6 @@ jobs:
             os: macos-latest
             preset: macos-release
             asset: surl-macos-arm64.tar.gz
-          - label: macOS x64
-            os: macos-13
-            preset: macos-release
-            asset: surl-macos-x64.tar.gz
     steps:
       - name: Checkout
         uses: actions/checkout@v4
