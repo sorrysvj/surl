@@ -57,6 +57,7 @@ jobs:
     name: Build Windows x64 release
     runs-on: windows-2022
     needs: verify
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -105,6 +106,7 @@ jobs:
     name: Build ${{ matrix.label }}
     runs-on: ${{ matrix.os }}
     needs: verify
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -123,9 +125,13 @@ jobs:
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
+        timeout-minutes: 10
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ninja-build libcurl4-openssl-dev
+          for attempt in 1 2 3; do
+            sudo apt-get update -o Acquire::Retries=3 &&             sudo apt-get install -y --no-install-recommends ninja-build libcurl4-openssl-dev &&             break
+            echo "apt attempt $attempt failed; retrying"
+            sleep 10
+          done
 
       - name: Install macOS dependencies
         if: runner.os == 'macOS'
@@ -160,6 +166,7 @@ jobs:
     name: Publish the GitHub release
     runs-on: ubuntu-latest
     needs: [verify, windows, unix]
+    if: always() && needs.verify.result == 'success' && needs.windows.result == 'success'
     # The only job that may write to the repository, and only what a release
     # needs.
     permissions:
