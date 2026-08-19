@@ -1,0 +1,53 @@
+# Build output
+/build/
+/build-*/
+/out/
+/dist/
+/install/
+cmake-build-*/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+cmake_install.cmake
+compile_commands.json
+_deps/
+
+# Compiler / linker artifacts
+*.obj
+*.o
+*.lib
+*.a
+*.pdb
+*.ilk
+*.exp
+*.idb
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Installer output
+/installer/windows/Output/
+*.iss.generated
+
+# Editors / IDE
+.idea/
+.vs/
+.vscode/
+*.user
+*.swp
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Python leftovers from the previous implementation
+.venv/
+__pycache__/
+
+# Local scratch
+/tmp/
+/scratch/

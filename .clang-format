@@ -1,0 +1,40 @@
+# SURL formatting rules. Run `clang-format -i` on files you touch.
+---
+Language: Cpp
+BasedOnStyle: Google
+
+ColumnLimit: 96
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+AccessModifierOffset: -4
+
+# Headers are grouped: the file's own header, then surl/, then the standard
+# library and platform headers. Keep the groups, do not let clang-format merge
+# them into one block.
+IncludeBlocks: Preserve
+SortIncludes: CaseSensitive
+
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
+
+BreakBeforeBraces: Attach
+BreakConstructorInitializers: BeforeColon
+ConstructorInitializerIndentWidth: 4
+PackConstructorInitializers: NextLine
+
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+SpaceAfterCStyleCast: false
+SpacesBeforeTrailingComments: 1
+Cpp11BracedListStyle: true
+FixNamespaceComments: true
+NamespaceIndentation: None
+
+AlwaysBreakTemplateDeclarations: Yes
+EmptyLineBeforeAccessModifier: LogicalBlock
+SeparateDefinitionBlocks: Always
