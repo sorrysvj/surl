@@ -103,7 +103,7 @@ else()
 endif()
 
 if(WIN32)
-    target_link_libraries(surl_core PUBLIC winhttp ws2_32 shlwapi advapi32)
+    target_link_libraries(surl_core PUBLIC winhttp ws2_32 shlwapi advapi32 shell32)
     if(MINGW)
         # MinGW needs these spelled out for std::thread / filesystem.
         target_link_libraries(surl_core PUBLIC bcrypt)

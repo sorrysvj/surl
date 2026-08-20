@@ -115,10 +115,33 @@ website/
 └── .surl/            SURL's own metadata (manifest + staged originals)
 ```
 
-Open `website/index.html` in a browser, or serve it properly:
+### Viewing the result
+
+Simple pages open straight from disk - SURL rewrites links to relative paths,
+so double-clicking `website/index.html` works.
+
+Anything the site loads *with JavaScript* will not, though: browsers block
+`fetch`/XHR, ES modules (`<script type="module">`), service workers and some
+fonts over `file://` because of CORS. That is why a page can look empty when
+opened directly.
+
+Serving the mirror over HTTP fixes all of it:
 
 ```bash
 surl serve ./website
+```
+
+```
+Serving C:\Users\you\website
+  http://127.0.0.1:8080/
+  press Ctrl+C to stop
+```
+
+Use `-p 3000` for a different port, and `--open` to launch your browser
+straight at it:
+
+```bash
+surl serve ./website -p 3000 --open
 ```
 
 ## CLI
@@ -207,6 +230,7 @@ surl serve ./website
 | --- | --- | --- |
 | `-p`, `--port <n>` | `8080` | Port for `surl serve` |
 | `--bind <address>` | `127.0.0.1` | Interface to bind |
+| `--open` | off | Open the mirror in your browser once serving |
 
 **Logging**
 
@@ -273,10 +297,10 @@ Machine-readable output for scripting:
 surl https://example.com -d ./site --json --quiet
 ```
 
-Preview the result:
+Preview the result in a browser:
 
 ```bash
-surl serve ./site -p 8080
+surl serve ./site -p 8080 --open
 ```
 
 ## Configuration

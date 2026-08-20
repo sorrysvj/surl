@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 #include <thread>
@@ -15,6 +16,7 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <shellapi.h>
 using socket_t = SOCKET;
 constexpr socket_t kInvalidSocket = INVALID_SOCKET;
 #else
@@ -85,6 +87,22 @@ void send_response(socket_t client, int status, std::string_view status_text,
 
     if (!send_all(client, head.data(), head.size())) return;
     if (include_body && !body.empty()) send_all(client, body.data(), body.size());
+}
+
+/// Hands a URL to the user's default browser. Best-effort: failing to open a
+/// browser must never stop the server that is already listening.
+void open_in_browser(const std::string& url) {
+#ifdef _WIN32
+    // ShellExecuteW with "open" is what the shell itself uses for a link.
+    const std::wstring wide(url.begin(), url.end());
+    ShellExecuteW(nullptr, L"open", wide.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+#elif defined(__APPLE__)
+    const std::string command = "open '" + url + "' >/dev/null 2>&1 &";
+    (void)std::system(command.c_str());
+#else
+    const std::string command = "xdg-open '" + url + "' >/dev/null 2>&1 &";
+    (void)std::system(command.c_str());
+#endif
 }
 
 std::string error_page(int status, std::string_view message) {
@@ -244,9 +262,14 @@ int cmd_serve(const Options& options) {
         return kExitError;
     }
 
+    const std::string url =
+        "http://" + options.bind_address + ":" + std::to_string(options.port) + "/";
+
     log().info("Serving " + path_to_utf8(root));
-    log().info("  http://" + options.bind_address + ":" + std::to_string(options.port) + "/");
+    log().info("  " + url);
     log().info("  press Ctrl+C to stop");
+
+    if (options.open_browser) open_in_browser(url);
 
     while (true) {
         const socket_t client = ::accept(listener, nullptr, nullptr);

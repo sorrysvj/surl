@@ -48,6 +48,8 @@ executable with no runtime dependency.
   `config`, `install`, `uninstall`, `update`, `version`.
 - 40+ options covering crawl shape, transfer, budgets, run mode and logging.
 - `--json` machine-readable output, `--dry-run` and `--list`.
+- `surl serve --open` launches the mirror in the default browser, which is
+  the reliable way to view a page whose content is loaded by JavaScript.
 - Distinct exit codes for success, runtime error, usage error and partial
   completion.
 

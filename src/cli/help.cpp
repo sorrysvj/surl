@@ -80,6 +80,7 @@ std::string help_text() {
         "SERVE\n"
         "  -p, --port <n>          Port for `surl serve` (default: 8080)\n"
         "      --bind <address>    Interface to bind (default: 127.0.0.1)\n"
+        "      --open              Open the mirror in your browser once serving\n"
         "\n"
         "LOGGING\n"
         "  -v, --verbose           Log every resource\n"
