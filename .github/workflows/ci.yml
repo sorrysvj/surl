@@ -155,6 +155,24 @@ jobs:
             exit 1
           fi
 
+      - name: Headers are self-contained
+        run: |
+          # MSVC pulls a lot of standard headers in transitively; GCC does not.
+          # Compiling each header on its own catches the missing include here
+          # rather than in a release build three platforms later.
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends g++
+          mkdir -p /tmp/gen/surl
+          sed -e 's/@PROJECT_VERSION_MAJOR@/0/'               -e 's/@PROJECT_VERSION_MINOR@/0/'               -e 's/@PROJECT_VERSION_PATCH@/0/'               -e 's/@PROJECT_VERSION@/0.0.0/'               -e 's/@SURL_GITHUB_OWNER@/sorrysvj/'               -e 's/@SURL_GITHUB_REPO@/surl/'               -e 's|@PROJECT_HOMEPAGE_URL@|https://github.com/sorrysvj/surl|'               cmake/version.hpp.in > /tmp/gen/surl/version.hpp
+          failed=0
+          for header in $(find include -name '*.hpp' | sort); do
+            if ! echo "#include \"$header\"" |                  g++ -std=c++20 -fsyntax-only -Iinclude -I/tmp/gen -x c++ - ; then
+              echo "::error file=$header::$header is not self-contained"
+              failed=1
+            fi
+          done
+          exit $failed
+
       - name: Version is a valid semantic version
         run: |
           VERSION="$(tr -d '[:space:]' < VERSION.txt)"
